@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Presupuesto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 800px;
+            margin: 0 auto;
+            border: 1px solid #3a4fae;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .header img {
+            height: 50px;
+        }
+        .company-info, .client-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .company-info div, .client-info div {
+            flex-basis: 50%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #3a4fae;
+        }
+        .total {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        .total div {
+            margin-left: 20px;
+        }
+        .signature {
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-box {
+            width: 200px;
+            height: 100px;
+            border: 1px solid #3a4fae;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #print-btn {
+            padding: 10px 20px;
+            background-color: #3a4fae;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Presupuesto 0000-24</h1>
+            <img src="https://static.vecteezy.com/system/resources/previews/004/572/121/original/budget-line-icon-logo-illustration-free-vector.jpg" alt="Logo de la empresa">
+        </div>
+        <div class="company-info">
+            <div>
+                <strong>DESCRIPCIÓN</strong>
+                <p>xx</p>
+                <p>xxxxxxxxx</p>
+                <p>NIF: x</p>
+                <p>Teléfono: x</p>
+                <p>Mail: x</p>
+            </div>
+            <div>
+                <strong>CLIENTE</strong>
+                <p>x</p>
+                <p>x </p>
+                <p>CIF: x</p>
+                <p>Teléfono: x </p>
+                <p>Mail: x</p>
+            </div>
+        </div>
+        <p>Fecha del presupuesto: 09/04/2024 </p>
+        <table id="myTable">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>DESCRIPCIÓN</th>
+                    <th>UNIDADES</th>
+                    <th>PRECIO</th>
+                    <th>DESCUENTO</th>
+                    <th>TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+        <br>
+        
+        <div id="total">
+              <p>SUB-TOTAL: 0,00 €</p>
+              <p>IVA %: 0,00%</p>
+              <p>TOTAL PRESUPUESTADO: 0,00 €</p>
+        </div>
+        <div class="signature">
+            <div>Firma</div>
+            <div>Firma del cliente</div>
+        </div>
+        <div class="signature">
+            <div class="signature-box"></div>
+            <div class="signature-box"></div>
+        </div>
+    </div>
+
+    <input type="text" id="descripcion" placeholder="DESCRIPCIÓN">
+    <input type="number" id="unidades" placeholder="UNIDADES">
+    <input type="text" id="precio" placeholder="PRECIO">
+    <input type="text" id="descuento" placeholder="DESCUENTO">
+    <button onclick="agregarFila()">Agregar Fila</button>
+    <button onclick="deleteSelectedRow()">Delete Selected Row</button>
+    <br>
+    <input type="number" id="iva" placeholder="IVA">
+    <button id="print-btn" onclick="printPDF()">Imprimir como PDF</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    
+    <script>
+        
+        const iva = document.getElementById("iva");
+
+        function printPDF() {
+            const opt = {
+                margin: 1,
+                filename: 'presupuesto.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(document.getElementById('container')).save();
+        }
+
+        function agregarFila() {
+            var descripcion = document.getElementById("descripcion").value;
+            var unidades = document.getElementById("unidades").value;
+            var precio = document.getElementById("precio").value;
+            var descuento = document.getElementById("descuento").value;
+
+            var table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow(table.rows.length);
+            
+            var cell0 = newRow.insertCell(0);
+            var checkboxInput = document.createElement("input");
+            checkboxInput.type = "checkbox";
+            cell0.appendChild(checkboxInput);
+
+            var cell1 = newRow.insertCell(1);
+            var cell2 = newRow.insertCell(2);
+            var cell3 = newRow.insertCell(3);
+            var cell4 = newRow.insertCell(4);
+            var cell5 = newRow.insertCell(5);
+
+            cell1.innerHTML = descripcion;
+            cell2.innerHTML = unidades;
+            cell3.innerHTML = precio;
+            cell4.innerHTML = descuento;
+            cell5.innerHTML = unidades * precio *(1-descuento/100);
+
+            calcularTotal();
+        }
+
+        function calcularTotal() {
+            var table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
+            var total = 0;
+            var total_iva = 0;
+
+            for (var i = 0; i < table.rows.length; i++) {
+                total += parseFloat(table.rows[i].cells[5].innerHTML);
+            }
+            total_iva = total *(1 + parseInt(iva.value)/100)
+
+            document.getElementById("total").innerHTML = "<p>SUB-TOTAL: " + total.toFixed(2) + " €</p>" +
+                                                        "<p>IVA %: " + parseInt(iva.value).toFixed(2) + " %</p>" +
+                                                        "<p>TOTAL PRESUPUESTADO: " + total_iva.toFixed(2) + " €</p>";
+        }
+
+        function deleteSelectedRow() {
+            let table = document.getElementById("myTable");
+            let deletedRowsCount = 0;
+
+            // Iterate backward through the rows since removing one will affect indexes
+            for (let i = table.rows.length - 1; i > 0; i--) {
+                if (table.rows[i].cells[0].firstChild.checked) {
+                table.deleteRow(i);
+                deletedRowsCount++;
+                }
+            }
+
+            if (deletedRowsCount === 0) {
+                alert("No row has been selected.");
+            }
+        }
+
+        // Function to toggle the active class when clicking on a row
+        function toggleActiveClass(event) {
+            event.target.parentElement.classList.toggle("active");
+        }
+
+        // Attach click events listeners to each row
+        const tableRows = document.querySelectorAll("#myTable tr");
+        tableRows.forEach((row) => row.addEventListener("click", toggleActiveClass));
+
+        iva.addEventListener('input', calcularTotal);
+    </script>
+    
+    
+</body>
+</html>
